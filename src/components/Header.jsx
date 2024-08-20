@@ -7,6 +7,7 @@ import { VscMenu } from "react-icons/vsc";
 export const Header = () => {
   const [isMegaOpen, setIsMegaOpen] = useState(false);
   const [megaMenuData, setMegaMenuData] = useState([]);
+  const closeMegaMenu=()=>{setIsMegaOpen(false);}
 
   return (
     <div className="relative z-50">
@@ -17,26 +18,29 @@ export const Header = () => {
         <Navigation
           openMega={setIsMegaOpen}
           setMegaMenuData={setMegaMenuData}
+          closeMegaMenu={closeMegaMenu}
         />
         <div className="flex items-center gap-2 text-3xl">
-          <Button />
-          <MobileMenu />
+          
+          <MobileMenu  closeMobileMenu={()=>{setIsMegaOpen(false)}} />
         </div>
       </header>
       {isMegaOpen && (
         <div className="bg-[#ffffff77] mt-2 p-8 fixed left-0 top-[100px] w-[95%] rounded-[25px] flex justify-center items-center transition border border-[#28282841] backdrop-blur-3xl left-[50%] translate-x-[-50%]  hidden md:block">
-          <MegaMenu megaMenuData={megaMenuData} />
+          <MegaMenu megaMenuData={megaMenuData} closeMegaMenu={closeMegaMenu}/>
         </div>
       )}
     </div>
   );
 };
 
-const Navigation = ({ openMega, setMegaMenuData }) => {
+const Navigation = ({ openMega, setMegaMenuData ,closeMegaMenu}) => {
   const handleMegaMenuOpen = (megaMenus) => {
     openMega((old) => !old);
     setMegaMenuData(megaMenus);
   };
+
+
   return (
     <div className="md:block hidden">
       <div className="sm:flex gap-6 ">
@@ -45,7 +49,9 @@ const Navigation = ({ openMega, setMegaMenuData }) => {
             {item?.inside?.length > 0 ? (
               <Link
                 to={item.url}
-                onClick={() => handleMegaMenuOpen(item?.inside)}
+                onClick={() => {
+                  handleMegaMenuOpen(item?.inside);
+                }}
                 className="text-lg cursor-pointer text-[#282828] hover:text-[#91B7AC] flex justify-center items-center gap-x-2"
               >
                 {item.name}
@@ -54,6 +60,7 @@ const Navigation = ({ openMega, setMegaMenuData }) => {
             ) : (
               <Link
                 to={item.url}
+                onClick={closeMegaMenu}
                 className="text-lg cursor-pointer text-[#282828] hover:text-[#29c79a] flex justify-center items-center gap-x-2"
               >
                 {item.name}
@@ -70,19 +77,20 @@ const Navigation = ({ openMega, setMegaMenuData }) => {
 const MobileMenu = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [test, setTest] = useState([]);
+  const closeMegaMenu=()=>{ setMobileOpen(false)}
 
   const handelMobileMenu = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
   const handleMobileMegaMenu = (insidedata) => {
-    // MegaMenu(insidedata);
     if (test.length > 0) {
       setTest([]);
     } else {
       setTest(insidedata);
     }
   };
+
 
   return (
     <>
@@ -101,7 +109,10 @@ const MobileMenu = () => {
                   <div>
                     <Link
                       to={item.url}
-                      onClick={() => handleMobileMegaMenu(item?.inside)}
+                      onClick={() => {
+                        handleMobileMegaMenu(item?.inside);
+                        
+                      }}
                       className="text-lg cursor-pointer text-[#282828] hover:text-[#91B7AC] flex items-center gap-x-2"
                     >
                       {item.name}
@@ -111,7 +122,8 @@ const MobileMenu = () => {
                       <ul className="flex items-start flex-col gap-y-2 transition my-2 ms-2">
                         {test?.map((el, index) => (
                           <li className="text-left text-sm" key={index}>
-                            <Link to="#"> {el.name}</Link>
+                            <Link to="#"
+                            > {el.name}</Link>
                           </li>
                         ))}
                       </ul>
@@ -120,6 +132,7 @@ const MobileMenu = () => {
                 ) : (
                   <Link
                     to={item.url}
+                    onClick={closeMegaMenu}
                     className="text-lg cursor-pointer text-[#282828] hover:text-[#29c79a] flex justify-center items-center gap-x-2"
                   >
                     {item.name}
@@ -147,12 +160,15 @@ const Button = () => {
   );
 };
 
-const MegaMenu = ({ megaMenuData }) => {
+const MegaMenu = ({ megaMenuData, closeMegaMenu }) => {
   return (
     <ul className="flex justify-center items-start flex-col gap-y-2 transition ">
       {megaMenuData?.map((el, index) => (
         <li className="text-left" key={index}>
-          <Link to={el.url}>{el.name}</Link>
+          <Link 
+          to={el.url}
+          onClick={closeMegaMenu}
+          >{el.name}</Link>
         </li>
       ))}
     </ul>
